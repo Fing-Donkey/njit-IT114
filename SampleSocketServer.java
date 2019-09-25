@@ -1,29 +1,46 @@
 package com.example.sockets;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.io.PrintWriter;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 public class SampleSocketServer {
-	public void start(int port) {
-		System.out.println("Waiting for server");
-		try(ServerSocket serverSocket = new ServerSocket(port);
-			Socket clientSocket = serverSocket.accept();
-			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));) {	
-		System.out.println("Client connected, waiting for message");
-		String fromClient = "", toClient = "";
-		while((fromClient = in.readLine()) != null) {
-			System.out.println("message from client: " + fromClient);
-			if("kill server".equalsIgnoreCase(fromClient)) {
-				System.out.println("Client killed server");
-				break;
+	int port =3001;
+	public SampleSocketServer(){}
+	private void start(int port) {
+		this.port = port;
+		System.out.println("Waiting for client");
+		try (ServerSocket serverSocket = new ServerSocket(port);
+				Socket client = serverSocket.accept();
+				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+				BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));) {
+			
+			System.out.println("Client connected, waiting for message");
+			String fromClient = "";
+			String toClient = "";
+			while ((fromClient = in.readLine()) != null) {
+				if ("kill server".equalsIgnoreCase(fromClient)) {
+					System.out.println("Client killed server");
+					break;
+				}
+				else {
+					System.out.println("From client: " + fromClient);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				System.out.println("closing server socket");
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
+		
 	}
 	public static void main(String[] args) {
 		System.out.println("Starting server");
