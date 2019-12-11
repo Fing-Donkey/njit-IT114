@@ -1,32 +1,27 @@
 package example.drawing;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Point;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Random;
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
+
 import javax.swing.BorderFactory;
-import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
+
 import com.example.sockets.SampleSocketClient;
-public class SomeUI extends Hyperlink{
+
+public class SomeUI{
 	public static boolean isRunning = true;
 	public static void main(String[] args) {
-		JFrame frame = new JFrame("send");
+		JFrame frame = new JFrame("chatroom");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		frame.setLayout(new BorderLayout());
@@ -65,7 +60,7 @@ public class SomeUI extends Hyperlink{
 							frame.setTitle(frame.getTitle() + " - " + n[1]);
 						}
 						else {
-							System.out.println("Appending to textarea");
+							System.out.println("Appending to textarea: " + m);
 							textArea.append(m +"\n");
 						}
 					}
@@ -123,7 +118,7 @@ public class SomeUI extends Hyperlink{
 		
 		JTextField input = new JTextField();
 			input.setText("");
-			input.setPreferredSize(new Dimension(100,40));
+			input.setPreferredSize(new Dimension(100,30));
 		
 		//create rock button
 		JButton send = new JButton();
@@ -132,7 +127,8 @@ public class SomeUI extends Hyperlink{
 		send.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				interaction.sendChoice("");
+				interaction.sendChoice(input.getText());
+				input.setText("");;
 			}
 		});
 		

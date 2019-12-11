@@ -4,25 +4,35 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import com.example.sockets.Payload.PayloadType;
-
 public class SampleSocketServer{
 	int port = -1;
-	
+	static int clientId =0;
 	List<ServerThread> clients = new ArrayList<ServerThread>();
+	HashMap<String, String[]>moves = new HashMap<String, String[]>();
 	public static boolean isRunning = true;
 	public SampleSocketServer() {
 		isRunning = true;
 	}
 	
-	public synchronized void broadcast(Payload payload) {
+	
+	public synchronized void broadcast(Payload payload, String except) {
 		System.out.println("Sending message to " + clients.size() + " clients");
 		for(int i = 0; i < clients.size(); i++) {
+			if(except != null && clients.get(i).getClientName().equals(except)){
+				continue;
+			}
 			clients.get(i).send(payload);
 		}
+	}
+	public String isBlacklisted(String m) {
+		return WordBlackList.filteredName(m);
+	}
+	public synchronized void broadcast(Payload payload) {
+		broadcast(payload, null);
 	}
 	public void removeClient(ServerThread client) {
 		Iterator<ServerThread> it = clients.iterator();
@@ -58,6 +68,7 @@ public class SampleSocketServer{
 	public synchronized void sendToClientByName(String name, Payload payload) {
 		for(int i = 0; i < clients.size(); i++) {
 			if(clients.get(i).getClientName().equals(name)) {
+				payload.payloadType = PayloadType.MESSAGE;
 				clients.get(i).send(payload);
 				break;
 			}
@@ -94,6 +105,7 @@ public class SampleSocketServer{
 							this);
 					thread.start();
 					clients.add(thread);
+					clientId++;
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

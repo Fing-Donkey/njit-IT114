@@ -4,7 +4,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import com.example.sockets.Payload.PayloadType;
+import com.example.sockets.PayloadType;
 
 public class ServerThread extends Thread{
 	private Socket client;
@@ -21,6 +21,10 @@ public class ServerThread extends Thread{
 		out = new ObjectOutputStream(client.getOutputStream());
 		in = new ObjectInputStream(client.getInputStream());
 		System.out.println("Spawned thread for client " + clientName);
+		server.broadcast(new Payload(PayloadType.CONNECT,clientName),clientName);
+		send(new Payload(PayloadType.MESSAGE, "Other clients online: " + server.clients.size()));
+		send(new Payload(PayloadType.UPDATE_NAME, clientName));
+		
 	}
 	@Override
 	public void run() {
@@ -49,7 +53,7 @@ public class ServerThread extends Thread{
 		System.out.println("Received: " + payload);
 		switch(payload.payloadType) {
 			case MESSAGE:
-				Payload toClient = new Payload(PayloadType.MESSAGE,clientName + ": " + payload.message);
+				Payload toClient = new Payload(PayloadType.MESSAGE,clientName + ": " + server.isBlacklisted(payload.message));
 				System.out.println("Sending: " + toClient.toString());
 				server.broadcast(toClient);
 			break;
